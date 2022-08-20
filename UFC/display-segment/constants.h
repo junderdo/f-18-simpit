@@ -5,10 +5,7 @@
 // display mode is common cathode for my 7 segment display
 const bool SEGMENT_DISPLAY_MODE = SEGMENT_DISPLAY_MODE_COMMON_CATHODE; // common cathode
 
-// refresh rate = ((period + (switching time * digit count)) * 1s / 1000 ms)^-1
-// here we have a refresh rate of 50hz,, ((20 ms + (0ms * 4)) * 1s/1000ms)^-1 = 50hz
-const int SEGMENT_DISPLAY_PERIOD = 20;
-const int DIGIT_SWITCH_DELAY = 0; // no delay between printing the next character
+const int SEGMENT_DISPLAY_COUNT = 6;
 
 // pin number assignments for segment anodes
 const int SEGMENT_PIN_A = 2;
@@ -18,7 +15,7 @@ const int SEGMENT_PIN_D = 5;
 const int SEGMENT_PIN_E = 7;
 const int SEGMENT_PIN_F = 12;
 const int SEGMENT_PIN_G = 8;
-const int SEGMENT_PIN_DP = 13;
+const int SEGMENT_PIN_DP = 13; // not used
 
 // pin number assignments for segment digit pins (common cathodes)
 const int SEGMENT_DIGIT_1 = 6;
@@ -27,7 +24,7 @@ const int SEGMENT_DIGIT_3 = 10;
 const int SEGMENT_DIGIT_4 = 11;
 
 
-const byte SEGMENT_DIGIT[]{
+const byte SEGMENT_DIGIT[] {
     SEGMENT_DIGIT_1,
     SEGMENT_DIGIT_2,
     SEGMENT_DIGIT_3,
