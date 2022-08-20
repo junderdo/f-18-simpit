@@ -26,13 +26,7 @@ LiquidCrystal_I2C lcd(LCD_ADDRESS, LCD_CHARS_PER_LINE, LCD_LINE_COUNT);
  * @description main program loop
  */
 void loop() {
-    digitalWrite( 13, HIGH);
-    Serial.println("Hello");
-    delay(1000);
-    digitalWrite( 13, LOW);
-
-    // DcsBios::loop();
-    // segmentTimer.update();
+    DcsBios::loop();
 }
 
 /********************************* begin init functions *************************************/
@@ -41,11 +35,9 @@ void loop() {
  * @description initializes output pins, serial connections and peripherals
  */
 void setup() {
-    Serial.begin(9600);
-    pinMode( 13, OUTPUT );
-    // setupLCDDisplays();
-    // setupSegmentDisplays();
-    // DcsBios::setup();
+    setupLCDDisplays();
+    setupSegmentDisplays();
+    DcsBios::setup();
 }
 
 /**
