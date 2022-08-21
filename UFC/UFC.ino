@@ -61,21 +61,22 @@ void setupLCDDisplays() {
  */
 void setupSegmentDisplays() {
     // set the pin mode to output for segment driver pins
-    pinMode(SEGMENT_PIN_A, OUTPUT);
-    pinMode(SEGMENT_PIN_B, OUTPUT);
-    pinMode(SEGMENT_PIN_C, OUTPUT);
-    pinMode(SEGMENT_PIN_D, OUTPUT);
-    pinMode(SEGMENT_PIN_E, OUTPUT);
-    pinMode(SEGMENT_PIN_F, OUTPUT);
-    pinMode(SEGMENT_PIN_G, OUTPUT);
-    pinMode(SEGMENT_PIN_DP, OUTPUT);
-    pinMode(SEGMENT_DIGIT_1, OUTPUT);
-    pinMode(SEGMENT_DIGIT_2, OUTPUT);
-    pinMode(SEGMENT_DIGIT_3, OUTPUT);
-    pinMode(SEGMENT_DIGIT_4, OUTPUT);
-    printStringTo7SegmentDisplay("0000", 0);
+    for (int i = 0; i < SEGMENT_DATA_LINES; i++) {
+        pinMode(SEGMENT_DATA_PINS[i], OUTPUT);
+    }
+    // set the pin mode to output for segment driver pins
+    for (int i = 0; i < SEGMENT_DIGIT_COUNT; i++) {
+        pinMode(SEGMENT_DIGIT_PINS[i], OUTPUT);
+    }
+    // set pin mode to output for display address pins
+    for (int i = 0; i < SEGMENT_ADDRESS_LINES; i++) {
+        pinMode(SEGMENT_ADDRESS_PINS[i], OUTPUT);
+    }
+
+    
+    printStringTo7SegmentDisplay("0000", 1); // print 0000 to display 1 (the 2nd display)
     delay(300);
-    printStringTo7SegmentDisplay("    ", 0);
+    // printStringTo7SegmentDisplay("    ", 0);
 }
 /********************************** end init functions **************************************/
 
