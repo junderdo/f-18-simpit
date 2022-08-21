@@ -21,14 +21,12 @@
 #include <Wire.h>
 
 LiquidCrystal_I2C lcd(LCD_ADDRESS, LCD_CHARS_PER_LINE, LCD_LINE_COUNT);
-TimerEvent segmentTimer;
 
 /**
  * @description main program loop
  */
 void loop() {
     DcsBios::loop();
-    segmentTimer.update();
 }
 
 /********************************* begin init functions *************************************/
@@ -37,10 +35,12 @@ void loop() {
  * @description initializes output pins, serial connections and peripherals
  */
 void setup() {
-    setupLCDDisplays();
+    delay(100);
     setupSegmentDisplays();
+    delay(100);
+    setupLCDDisplays();
+    delay(100);
     DcsBios::setup();
-    // Serial.begin(9600);
 }
 
 /**
@@ -52,6 +52,8 @@ void setupLCDDisplays() {
     lcd.backlight(); // enable backlight
     lcd.setCursor(0, 0); // set the cursor to column 0, line 0
     lcd.print("initializing..."); // Print a message to the LCD
+    delay(500);
+    lcd.clear();
 }
 
 /**
@@ -59,23 +61,24 @@ void setupLCDDisplays() {
  */
 void setupSegmentDisplays() {
     // set the pin mode to output for segment driver pins
-    pinMode(SEGMENT_PIN_A, OUTPUT);
-    pinMode(SEGMENT_PIN_B, OUTPUT);
-    pinMode(SEGMENT_PIN_C, OUTPUT);
-    pinMode(SEGMENT_PIN_D, OUTPUT);
-    pinMode(SEGMENT_PIN_E, OUTPUT);
-    pinMode(SEGMENT_PIN_F, OUTPUT);
-    pinMode(SEGMENT_PIN_G, OUTPUT);
-    pinMode(SEGMENT_PIN_DP, OUTPUT);
-    pinMode(SEGMENT_DIGIT_1, OUTPUT);
-    pinMode(SEGMENT_DIGIT_2, OUTPUT);
-    pinMode(SEGMENT_DIGIT_3, OUTPUT);
-    pinMode(SEGMENT_DIGIT_4, OUTPUT);
-    segmentTimer.set(SEGMENT_DISPLAY_PERIOD, refreshSegmentDisplay);
+    for (int i = 0; i < SEGMENT_DATA_LINES; i++) {
+        pinMode(SEGMENT_DATA_PINS[i], OUTPUT);
+    }
+    // set the pin mode to output for segment driver pins
+    for (int i = 0; i < SEGMENT_DIGIT_COUNT; i++) {
+        pinMode(SEGMENT_DIGIT_PINS[i], OUTPUT);
+    }
+    // set pin mode to output for display address pins
+    for (int i = 0; i < SEGMENT_ADDRESS_LINES; i++) {
+        pinMode(SEGMENT_ADDRESS_PINS[i], OUTPUT);
+    }
+
+    
+    printStringTo7SegmentDisplay("0000", 1); // print 0000 to display 1 (the 2nd display)
+    delay(300);
+    // printStringTo7SegmentDisplay("    ", 0);
 }
 /********************************** end init functions **************************************/
-
-
 
 /**************************** begin DCS BIOS event handlers *********************************/
 
@@ -83,12 +86,7 @@ void setupSegmentDisplays() {
  * @description handles output event to UFC options 1 - 4 digit 7 segment display
  */
 void onUfcOptionDisplay1Change(char* newValue) {
-    // printStringTo7Segment(newValue, 1000);
-    // printStringTo7Segment("jeff",1000);// use this function to print a string (has numbers, characters or phrases) when the length of string is 4 or less than 4, the second variable is the time for printing on display
-    // reset();// use this function to reset the display
-    // delay(1000);
-    // printStringTo7Segment("this text should scroll",300);// when the length of string is more than 4, the second variable is custom speed for movement
-    // delay(1000);
+    printStringTo7SegmentDisplay(newValue, 0);
 }
 DcsBios::StringBuffer<4> ufcOptionDisplay1Buffer(0x7432, onUfcOptionDisplay1Change);
 
@@ -114,7 +112,7 @@ DcsBios::StringBuffer<2> ufcScratchpadString2DisplayBuffer(0x7450, onUfcScratchp
  * @description handles output event to UFC scratchpad number display - 2 line lcd display
  */
 void onUfcScratchpadNumberDisplayChange(char* newValue) {
-    int col = 16 - strlen(newValue);
+    int col = LCD_CHARS_PER_LINE - strlen(newValue);
     lcd.setCursor(col, 0); // set the cursor to col, line 0
     lcd.print(newValue);  // Print a message to the LCD
 }
