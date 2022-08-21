@@ -8,8 +8,9 @@ const bool SEGMENT_DISPLAY_MODE = SEGMENT_DISPLAY_MODE_COMMON_CATHODE; // common
 const int SEGMENT_DISPLAY_COUNT = 6;
 
 // pin number assignments for segment anodes
-const int SEGMENT_PIN_A = 2;
-const int SEGMENT_PIN_B = 3;
+const int SEGMENT_PIN_A = 0;
+const int SEGMENT_PIN_B = 1;
+// note: On the Arduino Leonardo pins 2 and 3 do not work as digital outputs in combination with I2C (which is used by the lcd controller)
 const int SEGMENT_PIN_C = 4;
 const int SEGMENT_PIN_D = 5;
 const int SEGMENT_PIN_E = 7;

@@ -24,14 +24,13 @@ void reset7Segment() {
 /**
  * @description displays a character on the given digit of the 4 digit 7 segment display
  * @param characterToPrint the character to print
- * @param outputDigitPin the pin to which the char will be printed
+ * @param segmentDigitPin the pin to which the char will be printed
  */
 void printCharTo7SegmentDigit(
     char charToPrint,
-    int outputDigitPin
+    int segmentDigitPin
 ){
-    reset7Segment(); 
-    digitalWrite(outputDigitPin, SEGMENT_DISPLAY_MODE);
+    digitalWrite(segmentDigitPin, SEGMENT_DISPLAY_MODE);
 
     // find the index of the character to be displayed
     int characterIndex = -1; // id for non-displayable characters
@@ -45,21 +44,19 @@ void printCharTo7SegmentDigit(
         // for non-displayable/unrecognized characters display a hyphen
         digitalWrite(SEGMENT_PIN_G, !SEGMENT_DISPLAY_MODE);
     } else {
-        for (int i = 0; i <= 7; i++) {
-            if (SEGMENT_DISPLAY_MODE == SEGMENT_DISPLAY_MODE_COMMON_CATHODE) {
-                digitalWrite(SEGMENT_DIGIT[i], !CHARACTER_ARRAY[characterIndex][i]);
-            } else if(SEGMENT_DISPLAY_MODE == SEGMENT_DISPLAY_MODE_COMMON_CATHODE) {
-                digitalWrite(SEGMENT_DIGIT[i], CHARACTER_ARRAY[characterIndex][i]);
+        for (int i = 0; i < 8; i++) {
+            if (SEGMENT_DISPLAY_MODE == SEGMENT_DISPLAY_MODE_COMMON_ANODE) {
+                digitalWrite(SEGMENT_PINS[i], !CHARACTER_ARRAY[characterIndex][i]);
+            } else if (SEGMENT_DISPLAY_MODE ==SEGMENT_DISPLAY_MODE_COMMON_CATHODE) {
+                digitalWrite(SEGMENT_PINS[i], CHARACTER_ARRAY[characterIndex][i]);
             }
         }
     }
-
-    Serial.print(!CHARACTER_ARRAY[characterIndex]);
 }
 
 /**
  * @description prints a string to the 4 digit 7 segment display
- * @param stringToPrint the string to print
+ * @param stringToPrint the string to print only first 4 digits will be displayed
  * @param displayPeriod the period of time for which the string will be printed in milliseconds
  * @param displayIndex the display index that corresponds to the output display
  */
@@ -67,33 +64,22 @@ void printStringTo7SegmentDisplay(
     String stringToPrint,
     int displayIndex
 ) {
-    segmentDisplayStringArray[displayIndex] = stringToPrint;
+    reset7Segment();
     // TODO: use displayIndex to output to the correct display to enable multiple displays
-    char char1 = stringToPrint.charAt(0);
-    char char2 = stringToPrint.charAt(1);
-    char char3 = stringToPrint.charAt(2);
-    char char4 = stringToPrint.charAt(3);
-    int stringLength = stringToPrint.length();
-
-    if (1 > stringLength)
-        char1 = ' ';
-    else
-        char1 = stringToPrint.charAt(0);
-    if (2 > stringLength)
-        char2 = ' ';
-    else
-        char2 = stringToPrint.charAt(1);
-    if (3 > stringLength)
-        char3 = ' ';
-    else
-        char3 = stringToPrint.charAt(2);
-    if (4 > stringLength)
-        char4 = ' ';
-    else
-        char4 = stringToPrint.charAt(3);
-
-    printCharTo7SegmentDigit(char1, SEGMENT_DIGIT_1);
-    printCharTo7SegmentDigit(char2, SEGMENT_DIGIT_2);
-    printCharTo7SegmentDigit(char3, SEGMENT_DIGIT_3);
-    printCharTo7SegmentDigit(char4, SEGMENT_DIGIT_4);
+    stringToPrint.toLowerCase();
+    int length = stringToPrint.length();
+    int paddingLength = 4 - length;
+    if (paddingLength > 0) {
+        for (int i = 0; i < paddingLength; i++) {
+            stringToPrint = " " + stringToPrint;
+        }
+    }
+    printCharTo7SegmentDigit(stringToPrint.charAt(0), SEGMENT_DIGIT_1);
+    delay(2);
+    printCharTo7SegmentDigit(stringToPrint.charAt(1), SEGMENT_DIGIT_2);
+    delay(2);
+    printCharTo7SegmentDigit(stringToPrint.charAt(2), SEGMENT_DIGIT_3);
+    delay(2);
+    printCharTo7SegmentDigit(stringToPrint.charAt(3), SEGMENT_DIGIT_4);
+    delay(2);
 }

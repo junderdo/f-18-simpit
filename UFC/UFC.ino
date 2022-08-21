@@ -35,8 +35,11 @@ void loop() {
  * @description initializes output pins, serial connections and peripherals
  */
 void setup() {
-    setupLCDDisplays();
+    delay(100);
     setupSegmentDisplays();
+    delay(100);
+    setupLCDDisplays();
+    delay(100);
     DcsBios::setup();
 }
 
@@ -49,6 +52,8 @@ void setupLCDDisplays() {
     lcd.backlight(); // enable backlight
     lcd.setCursor(0, 0); // set the cursor to column 0, line 0
     lcd.print("initializing..."); // Print a message to the LCD
+    delay(500);
+    lcd.clear();
 }
 
 /**
@@ -68,8 +73,9 @@ void setupSegmentDisplays() {
     pinMode(SEGMENT_DIGIT_2, OUTPUT);
     pinMode(SEGMENT_DIGIT_3, OUTPUT);
     pinMode(SEGMENT_DIGIT_4, OUTPUT);
-    printStringTo7SegmentDisplay("ABCD", 0);
-    
+    printStringTo7SegmentDisplay("0000", 0);
+    delay(300);
+    printStringTo7SegmentDisplay("    ", 0);
 }
 /********************************** end init functions **************************************/
 
@@ -79,7 +85,7 @@ void setupSegmentDisplays() {
  * @description handles output event to UFC options 1 - 4 digit 7 segment display
  */
 void onUfcOptionDisplay1Change(char* newValue) {
-    printStringTo7SegmentDisplay((String) newValue, 0);
+    printStringTo7SegmentDisplay(newValue, 0);
 }
 DcsBios::StringBuffer<4> ufcOptionDisplay1Buffer(0x7432, onUfcOptionDisplay1Change);
 
