@@ -103,7 +103,7 @@ DcsBios::StringBuffer<2> ufcScratchpadString1DisplayBuffer(0x744e, onUfcScratchp
  * @description handles output event to UFC scratchpad big digit 2 display - 2 line lcd display
  */
 void onUfcScratchpadString2DisplayChange(char* newValue) {
-    lcd.setCursor(1, 0); // set the cursor to col 2, line 0
+    lcd.setCursor(2, 0); // set the cursor to col 2, line 0
     lcd.print(newValue);  // Print a message to the LCD
 }
 DcsBios::StringBuffer<2> ufcScratchpadString2DisplayBuffer(0x7450, onUfcScratchpadString2DisplayChange);
