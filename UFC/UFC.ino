@@ -1,32 +1,36 @@
 /* 
- * @description main script for UFC controller board assumed to be an Arduino Leonardo
+ * @description main script for UFC controller board assumed to be an Arduino Uno R3
  * @author Jeff Underdown <jeff.underdown@gmail.com>
  * 
- * notes from DCS BIOS author:
- *      default: '#define DCSBIOS_IRQ_SERIAL'
+ * @notes Arduino Uno has an ATMega328P -- Arduino Leo does not like the OLED screen
+ * default: '#define DCSBIOS_IRQ_SERIAL'
  *      use '#define DCSBIOS_DEFAULT_SERIAL' instead if your Arduino board
  *      does not feature an ATMega328 or ATMega2650 controller.
  * 
- * my notes:
- *      my Arduino Leo has an ATmega32u4
- * 
  */
-#define DCSBIOS_DEFAULT_SERIAL
-#include "display-segment/constants.h"
-#include "display-segment/functions.h"
-#include "display-lcd/constants.h"
+#define DCSBIOS_IRQ_SERIAL
 #include <DcsBios.h>
-#include <LiquidCrystal_I2C.h>
 #include <TimerEvent.h>
 #include <Wire.h>
+#include <SPI.h>
+#include "ssd1305.h"
 
-LiquidCrystal_I2C lcd(LCD_ADDRESS, LCD_CHARS_PER_LINE, LCD_LINE_COUNT);
+// oled display constants
+#define WIDTH     128
+#define HEIGHT     32
+#define PAGES       4
+// oled display pin assigments
+#define OLED_RST    9 
+#define OLED_DC     8
+#define OLED_CS    10
+#define SPI_MOSI   11    /* connect to the DIN pin of OLED */
+#define SPI_SCK    13     /* connect to the CLK pin of OLED */
 
 /**
  * @description main program loop
  */
 void loop() {
-    DcsBios::loop();
+    // DcsBios::loop();
 }
 
 /********************************* begin init functions *************************************/
@@ -35,86 +39,48 @@ void loop() {
  * @description initializes output pins, serial connections and peripherals
  */
 void setup() {
-    delay(100);
-    setupSegmentDisplays();
-    delay(100);
-    setupLCDDisplays();
-    delay(100);
-    DcsBios::setup();
+    setupOledDisplay();
+    // DcsBios::setup();
 }
 
 /**
- * @description initializes backlit lcd display(s)
+ * @description begins SPI connection to OLED display and displays boot sequence slideshow/video
  */
-void setupLCDDisplays() {
-    // init backlit lcd 2 line screen
-    lcd.init();
-    lcd.backlight(); // enable backlight
-    lcd.setCursor(0, 0); // set the cursor to column 0, line 0
-    lcd.print("initializing..."); // Print a message to the LCD
-    delay(500);
-    lcd.clear();
+void setupOledDisplay() {
+    SSD1305_boot();
 }
 
-/**
- * @description initializes 4 character 7 segment led displays
- */
-void setupSegmentDisplays() {
-    // set the pin mode to output for segment driver pins
-    for (int i = 0; i < SEGMENT_DATA_LINES; i++) {
-        pinMode(SEGMENT_DATA_PINS[i], OUTPUT);
-    }
-    // set the pin mode to output for segment driver pins
-    for (int i = 0; i < SEGMENT_DIGIT_COUNT; i++) {
-        pinMode(SEGMENT_DIGIT_PINS[i], OUTPUT);
-    }
-    // set pin mode to output for display address pins
-    for (int i = 0; i < SEGMENT_ADDRESS_LINES; i++) {
-        pinMode(SEGMENT_ADDRESS_PINS[i], OUTPUT);
-    }
-
-    
-    printStringTo7SegmentDisplay("0000", 1); // print 0000 to display 1 (the 2nd display)
-    delay(300);
-    // printStringTo7SegmentDisplay("    ", 0);
-}
 /********************************** end init functions **************************************/
 
 /**************************** begin DCS BIOS event handlers *********************************/
 
 /**
- * @description handles output event to UFC options 1 - 4 digit 7 segment display
+ * @description handles output event to UFC options 1 display - 4 digit 14 segment display
  */
 void onUfcOptionDisplay1Change(char* newValue) {
-    printStringTo7SegmentDisplay(newValue, 0);
 }
 DcsBios::StringBuffer<4> ufcOptionDisplay1Buffer(0x7432, onUfcOptionDisplay1Change);
 
+//TODO: add the other 5 options displays
+
 /**
- * @description handles output event to UFC scratchpad big digit 1 display - 2 line lcd display
+ * @description handles output event to UFC scratchpad big digit 1 display - oled display
  */
 void onUfcScratchpadString1DisplayChange(char* newValue) {
-    lcd.setCursor(0, 0); // set the cursor to col 0, line 0
-    lcd.print(newValue);  // Print a message to the LCD
 }
 DcsBios::StringBuffer<2> ufcScratchpadString1DisplayBuffer(0x744e, onUfcScratchpadString1DisplayChange);
 
 /**
- * @description handles output event to UFC scratchpad big digit 2 display - 2 line lcd display
+ * @description handles output event to UFC scratchpad big digit 2 display - oled display
  */
 void onUfcScratchpadString2DisplayChange(char* newValue) {
-    lcd.setCursor(2, 0); // set the cursor to col 2, line 0
-    lcd.print(newValue);  // Print a message to the LCD
 }
 DcsBios::StringBuffer<2> ufcScratchpadString2DisplayBuffer(0x7450, onUfcScratchpadString2DisplayChange);
 
 /**
- * @description handles output event to UFC scratchpad number display - 2 line lcd display
+ * @description handles output event to UFC scratchpad number display - oled display
  */
 void onUfcScratchpadNumberDisplayChange(char* newValue) {
-    int col = LCD_CHARS_PER_LINE - strlen(newValue);
-    lcd.setCursor(col, 0); // set the cursor to col, line 0
-    lcd.print(newValue);  // Print a message to the LCD
 }
 DcsBios::StringBuffer<8> ufcScratchpadNumberDisplayBuffer(0x7446, onUfcScratchpadNumberDisplayChange);
 
