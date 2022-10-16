@@ -27,6 +27,12 @@
 // - 256 brightness levels
 // - 21 RGB LEDs
 
+#define LED_CHANNEL_MIN 0
+#define LED_BRIGHTNESS_LEVEL_MIN 0
+
+#define LED_CHANNEL_MAX 63
+#define LED_BRIGHTNESS_LEVEL_MAX 255
+
 // ****************************************************************
 // I-Pac Ultimate I/O
 // ****************************************************************
