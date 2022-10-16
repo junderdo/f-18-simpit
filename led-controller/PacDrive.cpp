@@ -1,6 +1,7 @@
-// PacDrive.cpp : Defines the entry point for the console application.
-//
-
+/**
+ * @author Jeff Underdown <jeff.underdown@gmail.com>
+ * @description command line tool for controlling PacLED64 controller board
+ */
 #include "stdafx.h"
 #include "windows.h"
 #include "PacDrive.h"
@@ -25,6 +26,7 @@ int main(int argc, char* argv[]) {
 			intensity = stoi(arg);
 		}
 
+
 		// is this arg an identifier?
 		if (arg.substr(0, 1) == "-") {
 			lastArgName = arg.substr(1, 1);
@@ -39,6 +41,7 @@ int main(int argc, char* argv[]) {
 
 	cout << "address: " << address << "\n";
 	cout << "intensity: " << intensity << "\n";
+	cout << "done" << "\n";
 
 	PacShutdown();
 
