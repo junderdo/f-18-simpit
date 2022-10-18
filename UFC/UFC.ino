@@ -13,6 +13,7 @@
 #include <TimerEvent.h>
 #include <Wire.h>
 #include <SPI.h>
+#include <SparkFun_Alphanumeric_Display.h> //Click here to get the library: http://librarymanager/All#SparkFun_Qwiic_Alphanumeric_Display by SparkFun
 #include "ssd1305.h"
 
 // oled display constants
@@ -25,6 +26,10 @@
 #define OLED_CS    10
 #define SPI_MOSI   11    /* connect to the DIN pin of OLED */
 #define SPI_SCK    13     /* connect to the CLK pin of OLED */
+
+// 14 segment led displays
+HT16K33 display;
+
 
 /**
  * @description main program loop
@@ -40,14 +45,30 @@ void loop() {
  */
 void setup() {
     setupOledDisplay();
+    setup14segmentLedDisplays();
     // DcsBios::setup();
 }
 
 /**
- * @description begins SPI connection to OLED display and displays boot sequence slideshow/video
+ * @description inits SPI connection to OLED display then displays boot sequence slideshow/video
  */
 void setupOledDisplay() {
     SSD1305_boot();
+}
+
+/**
+ * @description inits I2C bus for 14 segment LED displays
+ * 
+ */
+void setup14segmentLedDisplays() {
+    Wire.begin(); //Join I2C bus
+
+    if (display.begin() == false) {
+        Serial.println("Device did not acknowledge! Freezing.");
+    }
+    Serial.println("Display acknowledged.");
+
+    display.print("Milk");
 }
 
 /********************************** end init functions **************************************/

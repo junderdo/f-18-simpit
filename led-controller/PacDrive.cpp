@@ -6,6 +6,7 @@
 #include "windows.h"
 #include "PacDrive.h"
 #include <iostream>
+#include <algorithm>
 #include <string>
 using namespace std;
 
@@ -14,16 +15,20 @@ int main(int argc, char* argv[]) {
 	string lastArgName;
 	int intensity = 0;
 	int address = 0;
+	bool setIntensity = false;
+	bool setAddress = false;
 
-	for (int i = 0; i < argc; ++i) {
+	for (int i = 0; i < argc; i++) {
 		string arg = argv[i];
 		
 		// if the last arg was an identifier then this one should be a value
 		if (lastArgName == "a") {
-			address = stoi(arg);
+			address = min(LED_CHANNEL_MAX, max(LED_CHANNEL_MIN, stoi(arg)));
+			setAddress = true;
 		}
 		else if (lastArgName == "i") {
-			intensity = stoi(arg);
+			intensity = min(LED_BRIGHTNESS_LEVEL_MAX, max(LED_BRIGHTNESS_LEVEL_MIN, stoi(arg)));
+			setIntensity = true;
 		}
 
 
@@ -35,15 +40,20 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	PacInitialize();
 
-	Pac64SetLEDIntensity(0, address, (byte) intensity);
+	if (setAddress && setIntensity) {
+		PacInitialize();
 
-	cout << "address: " << address << "\n";
-	cout << "intensity: " << intensity << "\n";
-	cout << "done" << "\n";
+		Pac64SetLEDIntensity(0, address, (byte) intensity);
 
-	PacShutdown();
+		cout << "address: " << address << "\n";
+		cout << "intensity: " << intensity << "\n";
+
+		PacShutdown();
+	} else {
+		throw "missing argument(s)";
+	}
+
 
 	return 0;
 }
