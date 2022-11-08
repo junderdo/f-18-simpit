@@ -16,33 +16,48 @@
 #include <TimerEvent.h>
 #include <Wire.h>
 #include <SPI.h>
-#include <SparkFun_Alphanumeric_Display.h> //Click here to get the library: http://librarymanager/All#SparkFun_Qwiic_Alphanumeric_Display by SparkFun
+#include <SparkFun_Alphanumeric_Display.h>
 #include "ssd1305.h"
 
 // oled display constants
 #define WIDTH     128
 #define HEIGHT     32
 #define PAGES       4
-// oled display pin assigments
-#define OLED_RST    9 
-#define OLED_DC     8
-#define OLED_CS    10
-#define SPI_MOSI   11    /* connect to the DIN pin of OLED */
-#define SPI_SCK    13     /* connect to the CLK pin of OLED */
+// spi interface oled display pin assigments
+#define OLED_RST    9 // reset pin
+#define OLED_DC     8 // data/command pin -- set by controller (uc) to indicate whether data or command will be sent to peripheral
+#define OLED_CS    10 // chip select pin
+#define SPI_MOSI   11 // data in pin -- data and commands sent through this pin
+#define SPI_SCK    13 // spi clock pin
 
-#define SEG_ADDR_BIT_0 7
+#define I2C_CLK_SPD 100000 // in hz
 
 // 14 segment display addresses
 #define SEG_1_I2C_ADDR 0x70
 #define SEG_2_I2C_ADDR 0x71
 #define SEG_3_I2C_ADDR 0x72
 #define SEG_4_I2C_ADDR 0x73
-#define SEG_5_I2C_ADDR SEG_1_I2C_ADDR
+#define SEG_5_I2C_ADDR 0x70 // on a separate bus from the first 4 displays
+
+// i2c segment bus multiplexer addresses
+#define MULTIPLEXER_BUS_ADDR_1_TO_4 0 // bus connected to segment displays 1 through 4
+#define MULTIPLEXER_BUS_ADDR_5 1 // bus connected to segment display 5
+
+
+// TCA9548A i2c bus multiplexer
+// tie A0, A1, A2 to VCC so that the 0x77 address is assigned to the TCA9548A multiplexer
+// the default is 0x70 and the 14 segment displays can only be assigned 0x70 - 0x73
+#define MUX_I2C_ADDR 0x77
 
 // 14 segment led displays
 HT16K33 display;
-char *optionDisplayText[] = {"....", "....", "....", "....", "...."};
-
+const char segmentDisplayAddr[] = {
+    SEG_1_I2C_ADDR,
+    SEG_2_I2C_ADDR,
+    SEG_3_I2C_ADDR,
+    SEG_4_I2C_ADDR,
+    SEG_5_I2C_ADDR
+};
 
 /**
  * @description main program loop
@@ -52,13 +67,12 @@ void loop() {
 }
 
 /********************************* begin init functions *************************************/
-
 /**
  * @description initializes output pins, serial connections and peripherals
  */
 void setup() {
     Serial.begin(9600);
-    Serial.print("setup \n");
+    Serial.print("startup\n");
     setup14segmentLedDisplays();
     setupOledDisplay();
     // DcsBios::setup();
@@ -76,35 +90,53 @@ void setupOledDisplay() {
  * 
  */
 void setup14segmentLedDisplays() {
-    // set bus address output pinmode
-    pinMode(SEG_ADDR_BIT_0, OUTPUT);
-    digitalWrite(SEG_ADDR_BIT_0, LOW);
     // join I2C bus
     Wire.begin();
-    display.begin(SEG_1_I2C_ADDR, SEG_2_I2C_ADDR, SEG_3_I2C_ADDR, SEG_4_I2C_ADDR);
+    Wire.setClock(I2C_CLK_SPD);
+    
     // animated sequence
-    // for (int i = 0; i < 6; i++) {
-    //     for (int j = 0; j < 5; j++) {
-    //         char* strToPrint = "....";
-    //         if (i == j) {
-    //             strToPrint = "INIT";
-    //         }
-    //         printToSegmentDisplay(j, strToPrint);
-    //     }
-    //     delay(100);
-    // }
+    printToSegmentDisplay(0, "----");
+    printToSegmentDisplay(1, "----");
+    printToSegmentDisplay(2, "----");
+    printToSegmentDisplay(3, "----");
+    printToSegmentDisplay(4, "----");
+    printToSegmentDisplay(0, "INIT");
+    printToSegmentDisplay(1, "0003");
+    printToSegmentDisplay(2, "0002");
+    printToSegmentDisplay(3, "0001");
+    printToSegmentDisplay(4, "0000");
+    for (int j = 0; j < 5; j++) {
+        char* strToPrint = "    ";
+        printToSegmentDisplay(j, strToPrint);
+    }
+}
 
-    display.print("TEST");
+/********************************** end init functions **************************************/
 
-    printToSegmentDisplay(0, "ABCD");
-    delay(100);
-    printToSegmentDisplay(1, "EFGH");
-    delay(100);
-    printToSegmentDisplay(2, "IJKL");
-    delay(100);
-    printToSegmentDisplay(3, "MNOP");
-    // delay(100);
-    // printToSegmentDisplay(4, "QRST");
+/******************************** begin utility functions ***********************************/
+/**
+ * @description connects to the given i2c bus address using the TCA9548A i2c bus multiplexer
+ * @param bus the address of the i2c bus with a range from 0 to 7
+ * 
+ * TODO: why does this function take 25 ms to execute? -- possibly due to the length of the i2c
+ *      bus cables that extend from the multiplexer to the devices. for i2c the capacitance of the
+ *      transmission wires is a big factor. a possible solution is to lower the baud rate which
+ *      might make the capacitance less of a factor. It might also be the pull-up resistor on the Vin
+ *      being too high or too low?
+ */
+void connectI2CBus(uint8_t bus) {
+    unsigned long startTime = millis();
+    
+    Wire.beginTransmission(MUX_I2C_ADDR);
+    Wire.write(1 << bus); // shift a '1' onto the position of the byte to select bus
+    Wire.endTransmission();
+
+    Serial.print("time to connect to bus: ");
+    Serial.print(millis() - startTime);
+    Serial.print(" ms \n");
+    // Serial.print("bus #");
+    // Serial.print(bus);
+    // Serial.print("\n");
 }
 
 /**
@@ -112,37 +144,37 @@ void setup14segmentLedDisplays() {
  * @param id the index of the print display
  * @param text the text to print -- length must always be 4 characters
  */
-void printToSegmentDisplay(int id, char* text) {
-    optionDisplayText[id] = text;
-    Serial.print("printToSegmentDisplay called \n");
-    Serial.print(id);
-    Serial.print("\n");
-    Serial.print(text);
-    Serial.print("\n");
-    char displayText[] = "                "; // 16 chars
+void printToSegmentDisplay(int id, char text[4]) {
+    // Serial.print("printing to segment #");
+    // Serial.print(id);
+    // Serial.print("\n");
+    // Serial.print(text);
+    // Serial.print("\n");
     if (id < 4) {
-        // first four displays are on one bus
-        digitalWrite(SEG_ADDR_BIT_0, LOW);
-        strcpy(displayText, *optionDisplayText[0]);
-        strcat(displayText, *optionDisplayText[1]);
-        strcat(displayText, *optionDisplayText[2]);
-        strcat(displayText, *optionDisplayText[3]);
+        // the first four displays are on one bus and share one string buffer
+        connectI2CBus(MULTIPLEXER_BUS_ADDR_1_TO_4);
     } else {
         // the 5th display is on a separate bus since there are only 4 possible
         // addresses on the segment display hardware
-        digitalWrite(SEG_ADDR_BIT_0, HIGH);
-        strcpy(displayText, *optionDisplayText[4]);
+        connectI2CBus(MULTIPLEXER_BUS_ADDR_5);
     }
-
-    delay(10);
+    display.begin(segmentDisplayAddr[id]);
+    // TODO: do not initialize every time we print
+    
+    unsigned long startTime = millis();
     display.initialize();
-    delay(10);
-    display.print(displayText);
-    delay(10);
-    free(displayText);
+    Serial.print("time to initialize display: ");
+    Serial.print(millis() - startTime);
+    Serial.print(" ms \n");
+
+    startTime = millis();
+    display.print(text);
+    Serial.print("time to print text to display: ");
+    Serial.print(millis() - startTime);
+    Serial.print(" ms \n");
 }
 
-/********************************** end init functions **************************************/
+/********************************* end utility functions ************************************/
 
 /**************************** begin DCS BIOS event handlers *********************************/
 
