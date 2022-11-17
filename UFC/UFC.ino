@@ -8,6 +8,7 @@
  *      does not feature an ATMega328 or ATMega2650 controller.
  * 
  */
+
 #define DCSBIOS_IRQ_SERIAL
 #include <stdio.h>
 #include <string.h>
@@ -19,6 +20,8 @@
 #include <SparkFun_Alphanumeric_Display.h>
 #include "ssd1305.h"
 
+
+/************************* begin oled scratchpad display constants **************************/
 // oled display constants
 #define WIDTH     128
 #define HEIGHT     32
@@ -30,6 +33,26 @@
 #define SPI_MOSI   11 // data in pin -- data and commands sent through this pin
 #define SPI_SCK    13 // spi clock pin
 
+// oled scratchpad output locations
+#define SCRATCHPAD_SECTIONS_COUNT = 3;
+// scratchpad 1 - 2 char display
+#define SCRATCHPAD_1_ADDR = 0;
+#define SCRATCHPAD_1_ORIGIN_X = 0;
+#define SCRATCHPAD_1_ORIGIN_Y = 4;
+#define SCRATCHPAD_1_FONT_SIZE = 16;
+// scratchpad 1 - 2 char display
+#define SCRATCHPAD_2_ADDR = 1;
+#define SCRATCHPAD_2_ORIGIN_X = 28;
+#define SCRATCHPAD_2_ORIGIN_Y = 4;
+#define SCRATCHPAD_2_FONT_SIZE = 16;
+// scratchpad 1 - 8+ char display
+#define SCRATCHPAD_3_ADDR = 2;
+#define SCRATCHPAD_3_ORIGIN_X = 56;
+#define SCRATCHPAD_3_ORIGIN_Y = 4;
+#define SCRATCHPAD_3_FONT_SIZE = 12;
+/************************** end oled scratchpad display constants ***************************/
+
+/********************* begin 14-segment and i2c multiplexer constants ***********************/
 #define I2C_CLK_SPD 100000 // in hz
 
 // 14 segment display addresses
@@ -38,20 +61,22 @@
 #define SEG_3_I2C_ADDR 0x72
 #define SEG_4_I2C_ADDR 0x73
 #define SEG_5_I2C_ADDR 0x70 // on a separate bus from the first 4 displays
+#define SEG_DISPLAY_COUNT = 5;
 
 // i2c segment bus multiplexer addresses
 #define MULTIPLEXER_BUS_ADDR_1_TO_4 0 // bus connected to segment displays 1 through 4
 #define MULTIPLEXER_BUS_ADDR_5 1 // bus connected to segment display 5
 
-
 // TCA9548A i2c bus multiplexer
 // tie A0, A1, A2 to VCC so that the 0x77 address is assigned to the TCA9548A multiplexer
 // the default is 0x70 and the 14 segment displays can only be assigned 0x70 - 0x73
 #define MUX_I2C_ADDR 0x77
+/********************** end 14-segment and i2c multiplexer constants ************************/
 
+/************************** begin global variables and constants ****************************/
 // 14 segment led displays
 HT16K33 display;
-const char segmentDisplayAddr[] = {
+const char segmentDisplayAddr[SEG_DISPLAY_COUNT] = {
     SEG_1_I2C_ADDR,
     SEG_2_I2C_ADDR,
     SEG_3_I2C_ADDR,
@@ -59,12 +84,32 @@ const char segmentDisplayAddr[] = {
     SEG_5_I2C_ADDR
 };
 
+// oled display
+const String oledDisplayText[SCRATCHPAD_SECTIONS_COUNT] = {
+    "",
+    "",
+    ""
+};
+const int sectionFontSize[SCRATCHPAD_SECTIONS_COUNT] = {
+    SCRATCHPAD_1_FONT_SIZE,
+    SCRATCHPAD_2_FONT_SIZE,
+    SCRATCHPAD_3_FONT_SIZE
+};
+const int sectionOrigin[SCRATCHPAD_SECTIONS_COUNT][2] = {
+    [SCRATCHPAD_1_ORIGIN_X, SCRATCHPAD_1_ORIGIN_Y],
+    [SCRATCHPAD_2_ORIGIN_X, SCRATCHPAD_2_ORIGIN_Y],
+    [SCRATCHPAD_3_ORIGIN_X, SCRATCHPAD_3_ORIGIN_Y]
+}
+/*************************** end global variables and constants *****************************/
+
+/******************************* begin main program loop ************************************/
 /**
  * @description main program loop
  */
 void loop() {
     // DcsBios::loop();
 }
+/******************************** end main program loop *************************************/
 
 /********************************* begin init functions *************************************/
 /**
@@ -93,6 +138,7 @@ void setup14segmentLedDisplays() {
     // join I2C bus
     Wire.begin();
     Wire.setClock(I2C_CLK_SPD);
+    delay(10);
     
     // animated sequence
     printToSegmentDisplay(0, "----");
@@ -174,6 +220,29 @@ void printToSegmentDisplay(int id, char text[4]) {
     Serial.print(" ms \n");
 }
 
+/**
+ * @description prints a string to a given section of the OLED display
+ * @param section the section number to print/overwrite
+ * @param text the text string to print
+ */
+void printToOLEDDisplay(int section, String text) {
+    if (section >= SCRATCHPAD_SECTIONS_COUNT) {
+        return;
+    }
+    oledDisplayText[section] = text;
+    SSD1305_clear(oled_buf);
+    for (int i = 0; i < SCRATCHPAD_SECTIONS_COUNT; i++) {
+        SSD1305_string(
+            sectionOrigin[i][0], // origin x
+            sectionOrigin[i][1], // origin y
+            oledDisplayText[i], // text to display
+            sectionFontSize[i], // font size
+            0, // mode 0 = write
+            oled_buf // buffer where screen data/pages are stored
+        );
+    }
+    SSD1305_display(oled_buf);
+}
 /********************************* end utility functions ************************************/
 
 /**************************** begin DCS BIOS event handlers *********************************/

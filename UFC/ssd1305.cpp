@@ -7,7 +7,7 @@
 #include <Wire.h>
 
 #include <stdio.h>
-#include "SSD1305.h"
+#include "ssd1305.h"
 
 // images
 #include "images/boot-f-18-c/boot-seq-1.c"
