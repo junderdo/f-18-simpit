@@ -16,10 +16,8 @@
 #define DCSBIOS_DEFAULT_SERIAL
 #include <DcsBios.h>
 
-// 
-
-Servo s1;
-Servo s2;
+Servo s1; // bank
+Servo s2; // pitch
 
 float scalingFactor = 180.0 / 32768.0;
 
@@ -46,11 +44,11 @@ void setup() {
  * @description initializes servos
  */
 void setupServos() {
+    // attach to the bank and pitch servos
     s1.attach(2); 
     s2.attach(3);
 
-
-
+    // move the bank servo through full range of motion and return to center
     s1.write(90);
     s2.write(90);
 
@@ -67,7 +65,7 @@ void setupServos() {
     s1.write(90);
 
 
-
+    // move the pitch servo through full range of motion and return to center
     delay(1000);
     s2.write(90);
 
