@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include "ssd1305.h"
+#include "oled.h"
 
 // images
 #include "images/boot-f-18-c/boot-seq-1.c"
@@ -31,6 +32,8 @@
 #include "images/boot-f-18-c/boot-seq-19.c"
 #include "images/boot-f-18-c/boot-seq-20.c"
 #include "images/boot-f-18-c/boot-seq-21.c"
+
+uint8_t oled_buf[WIDTH * HEIGHT / 8];
 
 const uint8_t Font1612[11][32] PROGMEM =
 {
@@ -451,8 +454,6 @@ void SSD1305_begin()
   command(0x08);//Set VCOM Deselect Level
   command(0xAF);//-Set Page Addressing Mode (0x00/0x01/0x02)
 }
-
-uint8_t oled_buf[WIDTH * HEIGHT / 8];
 
 void SSD1305_boot()
 {

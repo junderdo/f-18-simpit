@@ -3,6 +3,9 @@
         "initializer_list": "cpp",
         "xstring": "cpp",
         "xutility": "cpp",
-        "boot-seq-20.c": "cpp"
+        "boot-seq-20.c": "cpp",
+        "boot-seq-21.c": "cpp",
+        "boot-seq-1.c": "cpp",
+        "boot-seq-16.c": "cpp"
     }
 }
