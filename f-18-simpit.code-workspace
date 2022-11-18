@@ -4,5 +4,19 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"files.associations": {
+			"xlocale": "cpp",
+			"initializer_list": "cpp",
+			"xstring": "cpp",
+			"xutility": "cpp",
+			"boot-seq-4.c": "cpp",
+			"boot-seq-7.c": "cpp",
+			"boot-seq-19.c": "cpp",
+			"boot-seq-2.c": "cpp",
+			"boot-seq-3.c": "cpp",
+			"boot-seq-16.c": "cpp",
+			"boot-seq-21.c": "cpp"
+		}
+	}
 }

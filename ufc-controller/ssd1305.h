@@ -68,6 +68,8 @@ void SSD1305_string(uint8_t x, uint8_t y, const char *pString, uint8_t Size, uin
 void SPIWrite(uint8_t *buffer, int bufferLength);
 void command(uint8_t cmd);
 
+extern uint8_t oled_buf[WIDTH * HEIGHT / 8];
+
 extern const uint8_t waveshare_ch[448];
 extern const uint8_t Font1612[11][32];
 extern const uint8_t Signal816[16];

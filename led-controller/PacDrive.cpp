@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
 	bool setIntensity = false;
 	bool setAddress = false;
 
-	for (int i = 0; i < argc; ++i) {
+	for (int i = 0; i < argc; i++) {
 		string arg = argv[i];
 		
 		// if the last arg was an identifier then this one should be a value
