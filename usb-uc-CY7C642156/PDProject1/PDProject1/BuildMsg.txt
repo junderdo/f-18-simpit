@@ -1,0 +1,8 @@
+Starting MAKE...
+creating project.mk 
+
+make: *** No rule to make target `D:\Projects\Jeff\FA-18', needed by `lib/obj/psocconfig.o'.  Stop.
+
+ 
+PDProject1 - 1 error(s) 0 warning(s) 10:34:56
+
