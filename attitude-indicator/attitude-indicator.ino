@@ -8,7 +8,12 @@
  *      does not feature an ATMega328 or ATMega2650 controller.
  * 
  * my notes:
- *      my Arduino Pro Micro has an ATmega32u4
+ *      board: ELEGOO Nano Board CH 340/ATmega+328P (v3.0)
+ *      need CH 340 usb driver installed to program it
+ * arduino IDE programmer and board settings
+ *      board: Arduino Mini
+ *      processor: Atmega328P
+ *      programmer: AVRISP mkII
  * 
  */
 #include <Servo.h>
@@ -16,8 +21,11 @@
 #define DCSBIOS_DEFAULT_SERIAL
 #include <DcsBios.h>
 
-Servo s1; // bank
-Servo s2; // pitch
+#define PITCH_SERVO_PORT 3
+#define BANK_SERVO_PORT 2
+
+Servo sPitch; // pitch
+Servo sBank; // bank / roll
 
 float scalingFactor = 180.0 / 32768.0;
 
@@ -25,7 +33,6 @@ float scalingFactor = 180.0 / 32768.0;
  * @description main program loop
  */
 void loop() {
-    // moveServos();
     DcsBios::loop();
 }
 
@@ -45,41 +52,41 @@ void setup() {
  */
 void setupServos() {
     // attach to the bank and pitch servos
-    s1.attach(2); 
-    s2.attach(3);
+    sPitch.attach(PITCH_SERVO_PORT); 
+    sBank.attach(BANK_SERVO_PORT);
 
     // move the bank servo through full range of motion and return to center
-    s1.write(90);
-    s2.write(90);
+    sPitch.write(90);
+    sBank.write(90);
 
     delay(1000);
-    s1.write(0);
+    sPitch.write(0);
 
     delay(1000);
-    s1.write(90);
+    sPitch.write(90);
 
     delay(1000);
-    s1.write(180);
+    sPitch.write(180);
 
     delay(1000);
-    s1.write(90);
+    sPitch.write(90);
 
 
     // move the pitch servo through full range of motion and return to center
     delay(1000);
-    s2.write(90);
+    sBank.write(90);
 
     delay(1000);
-    s2.write(70);
+    sBank.write(70);
 
     delay(1000);
-    s2.write(90);
+    sBank.write(90);
 
     delay(1000);
-    s2.write(110);
+    sBank.write(110);
 
     delay(1000);
-    s2.write(90);
+    sBank.write(90);
 }
 
 /********************************** end init functions **************************************/
@@ -88,17 +95,14 @@ void setupServos() {
 
 void onSaiBankChange(unsigned int newValue) {
     int servoPos = max(0, min(180, newValue * scalingFactor - 90)); // range of motion of 0 - 180 degrees
-    s1.write(servoPos);
+    sPitch.write(servoPos);
 }
 DcsBios::IntegerBuffer saiBankBuffer(0x74d6, 0xffff, 0, onSaiBankChange);
 
 void onSaiPitchChange(unsigned int newValue) {
     int servoPos = max(70, min(110, newValue * scalingFactor - 90)); // range of motion of 70 - 110 degrees
-    s2.write(servoPos);
+    sBank.write(servoPos);
 }
 DcsBios::IntegerBuffer saiPitchBuffer(0x74d4, 0xffff, 0, onSaiPitchChange);
-
-
-
 
 /***************************** end DCS BIOS event handlers **********************************/
