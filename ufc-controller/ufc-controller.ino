@@ -3,10 +3,14 @@
  * @author Jeff Underdown <jeff.underdown@gmail.com>
  * 
  * @notes Arduino Uno has an ATMega328P -- Arduino Leo does not like the OLED screen
- * default: '#define DCSBIOS_IRQ_SERIAL'
- *      use '#define DCSBIOS_DEFAULT_SERIAL' instead if your Arduino board
- *      does not feature an ATMega328 or ATMega2650 controller.
- * 
+ *      default: '#define DCSBIOS_IRQ_SERIAL'
+ *          use '#define DCSBIOS_DEFAULT_SERIAL' instead if your Arduino board
+ *          does not feature an ATMega328 or ATMega2650 controller.
+ *      board: ELEGOO Nano Board CH 340/ATmega+328P (v3.0)
+ *          need CH 340 usb driver installed to program it
+ *      arduino IDE programmer and board settings:
+ *          board: Arduino Uno
+ *          programmer: AVRISP mkII
  */
 
 #define DCSBIOS_IRQ_SERIAL
