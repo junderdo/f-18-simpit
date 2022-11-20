@@ -33,6 +33,8 @@
 #include "images/boot-f-18-c/boot-seq-20.c"
 #include "images/boot-f-18-c/boot-seq-21.c"
 
+#include "images/white.c"
+
 uint8_t oled_buf[WIDTH * HEIGHT / 8];
 
 const uint8_t Font1612[11][32] PROGMEM =

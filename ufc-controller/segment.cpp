@@ -27,15 +27,15 @@ const char segmentDisplayAddr[SEG_DISPLAY_COUNT] = {
  *      being too high or too low?
  */
 void connectI2CBus(uint8_t bus) {
-    unsigned long startTime = millis();
+    // unsigned long startTime = millis();
     
     Wire.beginTransmission(MUX_I2C_ADDR);
     Wire.write(1 << bus); // shift a '1' onto the position of the byte to select bus
     Wire.endTransmission();
 
-    Serial.print("time to connect to bus: ");
-    Serial.print(millis() - startTime);
-    Serial.print(" ms \n");
+    // Serial.print("time to connect to bus: ");
+    // Serial.print(millis() - startTime);
+    // Serial.print(" ms \n");
     // Serial.print("bus #");
     // Serial.print(bus);
     // Serial.print("\n");
@@ -65,15 +65,15 @@ void printToSegmentDisplay(int id, char text[4]) {
     
     unsigned long startTime = millis();
     display.initialize();
-    Serial.print("time to initialize display: ");
-    Serial.print(millis() - startTime);
-    Serial.print(" ms \n");
+    // Serial.print("time to initialize display: ");
+    // Serial.print(millis() - startTime);
+    // Serial.print(" ms \n");
 
     startTime = millis();
     display.print(text);
-    Serial.print("time to print text to display: ");
-    Serial.print(millis() - startTime);
-    Serial.print(" ms \n");
+    // Serial.print("time to print text to display: ");
+    // Serial.print(millis() - startTime);
+    // Serial.print(" ms \n");
 }
 
 /**

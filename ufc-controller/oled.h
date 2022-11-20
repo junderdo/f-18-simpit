@@ -23,24 +23,24 @@
 #define SCRATCHPAD_SECTIONS_COUNT 3
 // scratchpad 1 - 2 char display
 #define SCRATCHPAD_1_ADDR 0
-#define SCRATCHPAD_1_ORIGIN_X 0
-#define SCRATCHPAD_1_ORIGIN_Y 4
+#define SCRATCHPAD_1_ORIGIN_X 6
+#define SCRATCHPAD_1_ORIGIN_Y 9
 #define SCRATCHPAD_1_FONT_SIZE 16
 // scratchpad 1 - 2 char display
 #define SCRATCHPAD_2_ADDR 1
-#define SCRATCHPAD_2_ORIGIN_X 28
-#define SCRATCHPAD_2_ORIGIN_Y 4
+#define SCRATCHPAD_2_ORIGIN_X 32
+#define SCRATCHPAD_2_ORIGIN_Y 9
 #define SCRATCHPAD_2_FONT_SIZE 16
 // scratchpad 1 - 8+ char display
 #define SCRATCHPAD_3_ADDR 2
-#define SCRATCHPAD_3_ORIGIN_X 56
-#define SCRATCHPAD_3_ORIGIN_Y 4
-#define SCRATCHPAD_3_FONT_SIZE 12
+#define SCRATCHPAD_3_ORIGIN_X 58
+#define SCRATCHPAD_3_ORIGIN_Y 9
+#define SCRATCHPAD_3_FONT_SIZE 16
 
 #define MODE_WRITE 0
 
 void refreshOledDisplay();
-void printToOLEDDisplay(int section, String text);
+void printToOLEDDisplay(int section, char* text);
 void setupOledDisplay();
 
 #endif
