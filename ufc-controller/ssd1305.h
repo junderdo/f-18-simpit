@@ -70,14 +70,4 @@ void command(uint8_t cmd);
 
 extern uint8_t oled_buf[WIDTH * HEIGHT / 8];
 
-extern const uint8_t waveshare_ch[448];
-extern const uint8_t Font1612[11][32];
-extern const uint8_t Signal816[16];
-extern const uint8_t Msg816[16];
-extern const uint8_t Bat816[16];
-extern const uint8_t Bluetooth88[8];
-extern const uint8_t GPRS88[8];
-extern const uint8_t Alarm88[8];
-
-
 #endif

@@ -6,6 +6,11 @@
         "boot-seq-20.c": "cpp",
         "boot-seq-21.c": "cpp",
         "boot-seq-1.c": "cpp",
-        "boot-seq-16.c": "cpp"
+        "boot-seq-16.c": "cpp",
+        "3.c": "cpp",
+        "font3216.c": "cpp",
+        "font1608.c": "cpp",
+        "7.c": "cpp",
+        "1.c": "cpp"
     }
 }
