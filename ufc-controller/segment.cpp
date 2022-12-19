@@ -101,8 +101,9 @@ void setup14segmentLedDisplays() {
     Wire.begin();
     Wire.setClock(I2C_CLK_SPD);
     delay(10);
-
-    
+    // initialize bus connection
+    connectI2CBus(currentBus);
+    delay(10);
     // animated sequence
     printToSegmentDisplay(0, "----");
     delay(10);
@@ -124,6 +125,7 @@ void setup14segmentLedDisplays() {
     delay(10);
     printToSegmentDisplay(4, "0000");
     
+    // clear the displays
     char* strToPrint = "    ";
     for (int j = 0; j < 5; j++) {
         printToSegmentDisplay(j, strToPrint);

@@ -260,8 +260,8 @@ void SSD1305_char(unsigned char x, unsigned char y, char acsii, char size, char 
     }
     for (j = 0; j < 8; j++)
     {
-      if (temp & 0x80) SSD1305_pixel(x, y, 1, buffer);
-      else SSD1305_pixel(x, y, 0, buffer);
+      if (temp & 0x80) SSD1305_pixel(x, y, 0, buffer);
+      else SSD1305_pixel(x, y, 1, buffer);
       temp <<= 1;
       y++;
       if ((y - y0) == width)
