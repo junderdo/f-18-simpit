@@ -66,6 +66,8 @@ void SSD1305_begin()
   pinMode(OLED_CS, OUTPUT);
   SPI.begin();
 
+  Serial.print("starting oled\n");
+
   SPI.setClockDivider(SPI_CLOCK_DIV128);
 
   digitalWrite(OLED_CS, LOW);
@@ -99,10 +101,12 @@ void SSD1305_begin()
   command(0xDB);//--set vcomh
   command(0x08);//Set VCOM Deselect Level
   command(0xAF);//-Set Page Addressing Mode (0x00/0x01/0x02)
+  Serial.print("oled startup complete\n");
 }
 
 void SSD1305_boot()
 {
+    Serial.print("booting oled\n");
     /* display boot sequence image slideshow/video */
     SSD1305_begin();
     SSD1305_clear(oled_buf);
@@ -188,6 +192,7 @@ void SSD1305_boot()
     SSD1305_clear(oled_buf);
     SSD1305_bitmap(0, 0, gImage_bootseq21, 128, 32, oled_buf);
     SSD1305_display(oled_buf);
+    Serial.print("oled boot complete\n");
 }
 
 void SSD1305_clear(uint8_t* buffer)
