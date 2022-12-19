@@ -35,7 +35,7 @@
 #include "20.c"
 #include "21.c"
 
-#include "black.c"
+#include "white.c"
 
 #include "font1206.c"
 #include "font1608.c"
@@ -65,6 +65,8 @@ void SSD1305_begin()
   pinMode(OLED_DC, OUTPUT);
   pinMode(OLED_CS, OUTPUT);
   SPI.begin();
+
+  // Serial.print("starting oled\n");
 
   SPI.setClockDivider(SPI_CLOCK_DIV128);
 
@@ -99,10 +101,12 @@ void SSD1305_begin()
   command(0xDB);//--set vcomh
   command(0x08);//Set VCOM Deselect Level
   command(0xAF);//-Set Page Addressing Mode (0x00/0x01/0x02)
+  // Serial.print("oled startup complete\n");
 }
 
 void SSD1305_boot()
 {
+    // Serial.print("booting oled\n");
     /* display boot sequence image slideshow/video */
     SSD1305_begin();
     SSD1305_clear(oled_buf);
