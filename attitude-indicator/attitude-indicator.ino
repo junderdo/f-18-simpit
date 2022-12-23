@@ -94,13 +94,13 @@ void setupServos() {
 /**************************** begin DCS BIOS event handlers *********************************/
 
 void onSaiBankChange(unsigned int newValue) {
-    int servoPos = max(0, min(180, newValue * scalingFactor - 90)); // range of motion of 0 - 180 degrees
+    int servoPos = max(0, min(180, (newValue - 90) * scalingFactor)); // range of motion [0, 180] degrees
     sPitch.write(servoPos);
 }
 DcsBios::IntegerBuffer saiBankBuffer(0x74d6, 0xffff, 0, onSaiBankChange);
 
 void onSaiPitchChange(unsigned int newValue) {
-    int servoPos = max(70, min(110, newValue * scalingFactor - 90)); // range of motion of 70 - 110 degrees
+    int servoPos = max(70, min(110, (newValue - 90) * scalingFactor)); // range of motion [70, 110] degrees
     sBank.write(servoPos);
 }
 DcsBios::IntegerBuffer saiPitchBuffer(0x74d4, 0xffff, 0, onSaiPitchChange);
