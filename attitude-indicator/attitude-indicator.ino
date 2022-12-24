@@ -21,13 +21,13 @@
 #define DCSBIOS_DEFAULT_SERIAL
 #include <DcsBios.h>
 
-#define PITCH_SERVO_PORT 3
 #define BANK_SERVO_PORT 2
+#define PITCH_SERVO_PORT 3
 
 Servo sPitch; // pitch
 Servo sBank; // bank / roll
 
-float scalingFactor = 180.0 / 32768.0;
+float scalingFactor = 180 / 32768.0;
 
 /**
  * @description main program loop
@@ -42,7 +42,7 @@ void loop() {
  * @description initializes output pins, serial connections and peripherals
  */
 void setup() {
-    Serial.begin(9600);
+    // Serial.begin(9600);
     setupServos();
     DcsBios::setup();
 }
@@ -59,34 +59,42 @@ void setupServos() {
     sPitch.write(90);
     sBank.write(90);
 
-    delay(1000);
-    sPitch.write(0);
+    delay(100);
+    sPitch.write(80);
+    delay(100);
+    sBank.write(45);
+    delay(100);
+    sPitch.write(70);
+    delay(100);
+    sBank.write(0);
 
-    delay(1000);
+
+    delay(100);
+    sPitch.write(80);
+    delay(100);
+    sBank.write(45);
+    delay(100);
     sPitch.write(90);
+    delay(100);
+    sBank.write(90);
 
-    delay(1000);
-    sPitch.write(180);
+    delay(100);
+    sPitch.write(100);
+    delay(100);
+    sBank.write(135);
+    delay(100);
+    sPitch.write(110);
+    delay(100);
+    sBank.write(180);
 
-    delay(1000);
+    delay(100);
+    sPitch.write(100);
+    delay(100);
+    sBank.write(135);
+    delay(100);
     sPitch.write(90);
-
-
-    // move the pitch servo through full range of motion and return to center
-    delay(1000);
-    sBank.write(90);
-
-    delay(1000);
-    sBank.write(70);
-
-    delay(1000);
-    sBank.write(90);
-
-    delay(1000);
-    sBank.write(110);
-
-    delay(1000);
-    sBank.write(90);
+    delay(100);
+    sBank.write(90);  
 }
 
 /********************************** end init functions **************************************/
@@ -94,14 +102,14 @@ void setupServos() {
 /**************************** begin DCS BIOS event handlers *********************************/
 
 void onSaiBankChange(unsigned int newValue) {
-    int servoPos = max(0, min(180, (newValue - 90) * scalingFactor)); // range of motion [0, 180] degrees
-    sPitch.write(servoPos);
+    int servoPos = map(newValue, 0, 65535, 0, 180); // range of motion [0, 180] degrees
+    sBank.write(servoPos);
 }
 DcsBios::IntegerBuffer saiBankBuffer(0x74d6, 0xffff, 0, onSaiBankChange);
 
 void onSaiPitchChange(unsigned int newValue) {
-    int servoPos = max(70, min(110, (newValue - 90) * scalingFactor)); // range of motion [70, 110] degrees
-    sBank.write(servoPos);
+    int servoPos = max(70, min(110, map(newValue, 0, 65535, 0, 180))); // range of motion [70, 110] degrees
+    sPitch.write(servoPos);
 }
 DcsBios::IntegerBuffer saiPitchBuffer(0x74d4, 0xffff, 0, onSaiPitchChange);
 
