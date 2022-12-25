@@ -5,9 +5,6 @@
 #ifndef _OLED_H_
 #define _OLED_H_
 
-#include <string.h>
-#include <stdlib.h>
-
 // oled display constants
 #define WIDTH     128
 #define HEIGHT     32

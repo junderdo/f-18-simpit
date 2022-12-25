@@ -21,13 +21,18 @@
 #define DCSBIOS_DEFAULT_SERIAL
 #include <DcsBios.h>
 
-#define PITCH_SERVO_PORT 3
 #define BANK_SERVO_PORT 2
+#define PITCH_SERVO_PORT 3
 
-Servo sPitch; // pitch
+#define BANK_ORIGIN 90 // both servos are centered at 90 degrees;
+#define BANK_MIN 0
+#define BANK_MAX 180
+#define PITCH_ORIGIN 90
+#define PITCH_MIN 70
+#define PITCH_MAX 110
+
 Servo sBank; // bank / roll
-
-float scalingFactor = 180.0 / 32768.0;
+Servo sPitch; // pitch
 
 /**
  * @description main program loop
@@ -42,9 +47,8 @@ void loop() {
  * @description initializes output pins, serial connections and peripherals
  */
 void setup() {
-    Serial.begin(9600);
     setupServos();
-    DcsBios::setup();
+    // DcsBios::setup();
 }
 
 /**
@@ -55,53 +59,87 @@ void setupServos() {
     sPitch.attach(PITCH_SERVO_PORT); 
     sBank.attach(BANK_SERVO_PORT);
 
-    // move the bank servo through full range of motion and return to center
-    sPitch.write(90);
-    sBank.write(90);
+    // center both axis servos
+    setBank(BANK_ORIGIN);
+    setPitch(PITCH_ORIGIN);
 
-    delay(1000);
-    sPitch.write(0);
+    selfTest();
+}
 
-    delay(1000);
-    sPitch.write(90);
+/**
+ * @description moves the bank and pitch servos through full range of motion then returns to center
+ */
+void selfTest() {
+    int deltaT = 17; // 1000 ms / 60fps = 16.66...
+    int deltaBank = 3; // 180 deg / 60 fps = 3 deg
+    int deltaPitch = 1; // 40 deg / 60 fps =< 1 deg
+    int halfRotationFrameCount = 30;
+    for (
+        int i = 0;
+        i > 0 - halfRotationFrameCount;
+        i--
+    ) {
+        setBank(BANK_ORIGIN + (deltaBank * i));
+        setPitch(PITCH_ORIGIN + (deltaPitch * i));
+        delay(deltaT);
+    }
 
-    delay(1000);
-    sPitch.write(180);
+    for (
+        int i = 0 - halfRotationFrameCount;
+        i < halfRotationFrameCount;
+        i++
+    ) {
+        setBank(BANK_ORIGIN + (deltaBank * i));
+        setPitch(PITCH_ORIGIN + (deltaPitch * i));
+        delay(deltaT);
+    }
 
-    delay(1000);
-    sPitch.write(90);
-
-
-    // move the pitch servo through full range of motion and return to center
-    delay(1000);
-    sBank.write(90);
-
-    delay(1000);
-    sBank.write(70);
-
-    delay(1000);
-    sBank.write(90);
-
-    delay(1000);
-    sBank.write(110);
-
-    delay(1000);
-    sBank.write(90);
+    for (
+        int i = halfRotationFrameCount;
+        i > 0;
+        i--
+    ) {
+        setBank(BANK_ORIGIN + (deltaBank * i));
+        setPitch(PITCH_ORIGIN + (deltaPitch * i));
+        delay(deltaT);
+    }
 }
 
 /********************************** end init functions **************************************/
 
+/*************************** begin servo controller methods *********************************/
+
+/**
+ * @description sets bank servo rotation value
+ * @param bank the new rotation angle in degrees
+ */
+void setBank(int bank) {
+    sBank.write(
+        max(0, min(180, bank))
+    );
+}
+
+/**
+ * @description sets pitch servo rotation value
+ * @param pitch the new rotation angle in degrees
+ */
+void setPitch(int pitch) {
+    sPitch.write(
+        max(70, min(110, pitch))
+    );
+}
+
+/**************************** end servo controller methods **********************************/
+
 /**************************** begin DCS BIOS event handlers *********************************/
 
 void onSaiBankChange(unsigned int newValue) {
-    int servoPos = max(0, min(180, newValue * scalingFactor - 90)); // range of motion of 0 - 180 degrees
-    sPitch.write(servoPos);
+    setBank(map(newValue, 0, 65535, 0, 180)); // range of motion [0, 180] degrees
 }
 DcsBios::IntegerBuffer saiBankBuffer(0x74d6, 0xffff, 0, onSaiBankChange);
 
 void onSaiPitchChange(unsigned int newValue) {
-    int servoPos = max(70, min(110, newValue * scalingFactor - 90)); // range of motion of 70 - 110 degrees
-    sBank.write(servoPos);
+    setPitch(map(newValue, 0, 65535, 0, 180)); // range of motion [70, 110] degrees
 }
 DcsBios::IntegerBuffer saiPitchBuffer(0x74d4, 0xffff, 0, onSaiPitchChange);
 

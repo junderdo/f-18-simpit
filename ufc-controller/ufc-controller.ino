@@ -20,7 +20,6 @@
 #include <DcsBios.h>
 #include "oled.h"
 #include "segment.h"
-
 /************************** begin global variables and constants ****************************/
 
 /*************************** end global variables and constants *****************************/
@@ -41,9 +40,8 @@ void loop() {
  */
 void setup() {
     // Serial.begin(9600);
-    // Serial.print("startup\n");
-    setup14segmentLedDisplays();
     setupOledDisplay();
+    setup14segmentLedDisplays();
     DcsBios::setup();
 }
 
@@ -111,7 +109,7 @@ DcsBios::StringBuffer<2> ufcScratchpadString2DisplayBuffer(0x7450, onUfcScratchp
  * @description handles output event to UFC scratchpad number display - oled display
  */
 void onUfcScratchpadNumberDisplayChange(char* newValue) {
-    printToOLEDDisplay(SCRATCHPAD_3_ADDR, newValue);
+    
 }
 DcsBios::StringBuffer<8> ufcScratchpadNumberDisplayBuffer(0x7446, onUfcScratchpadNumberDisplayChange);
 
