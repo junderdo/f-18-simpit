@@ -48,7 +48,7 @@ void loop() {
  */
 void setup() {
     setupServos();
-    // DcsBios::setup();
+    DcsBios::setup();
 }
 
 /**
