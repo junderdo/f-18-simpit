@@ -76,7 +76,7 @@ void printToSegmentDisplay(int id, char text[4]) {
 
     // Serial.print("display.begin() start \n");
     display.begin(segmentDisplayAddr[id]);
-    unsigned long startTime = millis();
+    // unsigned long startTime = millis();
     // Serial.print("display.initialize() start \n");
     // TODO: do not initialize every time we print
     display.initialize();
@@ -84,7 +84,7 @@ void printToSegmentDisplay(int id, char text[4]) {
     // Serial.print(millis() - startTime);
     // Serial.print(" ms \n");
 
-    startTime = millis();
+    // startTime = millis();
     display.print(text);
     // Serial.print("time to print text to display: ");
     // Serial.print(millis() - startTime);
